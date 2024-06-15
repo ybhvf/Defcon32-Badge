@@ -8,4 +8,5 @@
   (lib (name "STX-3790-5N")(type "KiCad")(uri "${KIPRJMOD}/lib_sch/STX-3790-5N.kicad_sym")(options "")(descr ""))
   (lib (name "TPS61023")(type "KiCad")(uri "${KIPRJMOD}/lib_sch/TPS61023.kicad_sym")(options "")(descr ""))
   (lib (name "INMP441")(type "KiCad")(uri "${KIPRJMOD}/lib_sch/INMP441.kicad_sym")(options "")(descr ""))
+  (lib (name "SC189ZULTRT")(type "KiCad")(uri "${KIPRJMOD}/lib_sch/SC189ZULTRT.kicad_sym")(options "")(descr ""))
 )
