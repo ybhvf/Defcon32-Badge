@@ -1,0 +1,261 @@
+%PDF-1.5
+%€‚ƒ
+5 0 obj
+<< /Length 6 0 R /Filter /FlateDecode >>
+stream
+xÚ•”KnÜ@D÷>EŸ@ [¿®È2GÈ,ö&›\?İê‹#8cDREVÍóX‘3)?óññ4|Ï¿¿ë$üùÕ~|iY·c;Âß·§ÙMgÇ"û®×Ûé8ôo+Ösmõû¬ã‘$×bŸÚ;?ov¯{Ş¼Ä Q±ÆkqÜGùŞKMñÔRö×Ÿ]pw¤|,RJ	‘4[MY!ç‘£„Yc/Ò¹œ(µäÙÎ¸l[/9ÌƒÎy’VVõ,Ëò‡mì)µlÙîÜ~•s½Î‡µKLÆá.jGÁáN8œøpBášz–.œ‚Â)(\-M¸6Öl¸¾û.9909xr`r`rğäÀäÀäàÉÉÈá‰Ü§ß@ús…#
+"
+&
+OLL(˜(˜(<Q0QQ¼@4{b¤¦Qª”©3S¹L¦*Å¡Îyñ¯S=ÊjÁ4ŠÃ©¾˜Ííé¼ŞæÕyÿÕ!îXMƒƒ\(xWÒ¯h†ºrÛ;×q½Ï	¬ó~O6¦CšãĞ4ŠÅ|`7(cÊŸÌä‘—ÑˆÈÿí¯²jgY˜F18Õ·¾»Q—Ûtøº´ìû?á:=ÓàpbÃ‰'®igéÂÕO¨+›¶»“—ûtø¢pŸ’ƒ'&&"·
+‘[…È™²0bpª+090909<‘{ıû8Äƒ(˜(˜(ˆ¨±M¡«Ö”.t¥2Ô˜(˜(˜(^ ºŠ#jÕ ]…‰*U&ª¨2Q%¢}w#:/·)u¾¿Ftˆ;QÓàĞbC‹-ºiÕU&ªD´íîDÇå>%¢Îw	ı´äNV
+endstream
+endobj
+6 0 obj
+620
+endobj
+10 0 obj
+[7 0 R 8 0 R 9 0 R]
+endobj
+11 0 obj
+<<
+/Type /Page
+/Parent 1 0 R
+/Resources <<
+    /ProcSet [/PDF /Text /ImageC /ImageB]
+    /Font 2 0 R
+    /XObject 3 0 R >>
+/MediaBox [0 0 841.896 595.296]
+/Contents 5 0 R
+/Annots 10 0 R>>
+endobj
+12 0 obj
+<</S /GoTo /D [11 0 R /Fit]
+>>
+endobj
+15 0 obj
+<</S /GoTo /D [11 0 R /FitR 32 883 103 848]
+>>
+endobj
+17 0 obj
+<</S /GoTo /D [11 0 R /FitR 179 883 251 848]
+>>
+endobj
+19 0 obj
+<</S /GoTo /D [11 0 R /FitR -9 676 39 624]
+>>
+endobj
+21 0 obj
+<< /BaseFont /Helvetica
+   /Type /Font
+   /Subtype /Type1
+   /Encoding /WinAnsiEncoding
+>>
+endobj
+22 0 obj
+<< /BaseFont /Helvetica-Oblique
+   /Type /Font
+   /Subtype /Type1
+   /Encoding /WinAnsiEncoding
+>>
+endobj
+23 0 obj
+<< /BaseFont /Helvetica-Bold
+   /Type /Font
+   /Subtype /Type1
+   /Encoding /WinAnsiEncoding
+>>
+endobj
+24 0 obj
+<< /BaseFont /Helvetica-BoldOblique
+   /Type /Font
+   /Subtype /Type1
+   /Encoding /WinAnsiEncoding
+>>
+endobj
+2 0 obj
+<<
+    /KicadFont 21 0 R
+    /KicadFontI 22 0 R
+    /KicadFontB 23 0 R
+    /KicadFontBI 24 0 R
+>>
+endobj
+3 0 obj
+<<
+>>
+endobj
+7 0 obj
+<<
+/Type /Annot
+/Subtype /Link
+/Rect [50.315 857.246 86.0882 874.594]
+/Border [16 16 0]
+/A << /Type /Action /S /JavaScript /JS (ShM\([
+["Reference designator = X1"],
+["Value = Badgelife_sao_connector_v169bis"],
+["Footprint = Badgelife-Shitty-v1.69bis-Minimal-Front"],
+]\);) >>
+>>
+endobj
+8 0 obj
+<<
+/Type /Annot
+/Subtype /Link
+/Rect [197.66 857.246 233.433 874.594]
+/Border [16 16 0]
+/A << /Type /Action /S /JavaScript /JS (ShM\([
+["Reference designator = X2"],
+["Value = Badgelife_sao_connector_v169bis"],
+["Footprint = Badgelife-Shitty-v1.69bis-Minimal-Front"],
+]\);) >>
+>>
+endobj
+9 0 obj
+<<
+/Type /Annot
+/Subtype /Link
+/Rect [3.01261 637.551 27.5573 663.575]
+/Border [16 16 0]
+/A << /Type /Action /S /JavaScript /JS (ShM\([
+["Reference designator = G***"],
+["Value = LOGO"],
+["Footprint = hamster"],
+]\);) >>
+>>
+endobj
+4 0 obj
+<< /JavaScript
+ << /Names
+    [ (JSInit) << /Type /Action /S /JavaScript /JS (
+function ShM\(aEntries\) {
+    var aParams = [];
+    for \(var i in aEntries\) {
+        aParams.push\({
+            cName: aEntries[i][0],
+            cReturn: aEntries[i][1]
+        }\)
+    }
+
+    var cChoice = app.popUpMenuEx.apply\(app, aParams\);
+    if \(cChoice != null && cChoice.substring\(0, 1\) == '#'\) this.pageNum = parseInt\(cChoice.slice\(1\)\);
+    else if \(cChoice != null && cChoice.substring\(0, 4\) == 'http'\) app.launchURL\(cChoice\);
+}
+) >> ]
+ >>
+>>
+endobj
+1 0 obj
+<<
+/Type /Pages
+/Kids [
+11 0 R
+]
+/Count 1
+>>
+endobj
+25 0 obj
+<<
+/Producer (KiCad PDF)
+/CreationDate (D:20240620001608)
+/Creator (PCBNEW)
+/Title (dc32-front-B_Mask.pdf)
+>>
+endobj
+20 0 obj
+<<
+/Title (G***)
+/Parent 14 0 R
+/Next 16 0 R
+/A 19 0 R
+>>
+endobj
+16 0 obj
+<<
+/Title (X1)
+/Parent 14 0 R
+/Next 18 0 R
+/Prev 20 0 R
+/A 15 0 R
+>>
+endobj
+18 0 obj
+<<
+/Title (X2)
+/Parent 14 0 R
+/Prev 16 0 R
+/A 17 0 R
+>>
+endobj
+14 0 obj
+<<
+/Title (Footprints)
+/Parent 13 0 R
+/Count -3
+/First 20 0 R
+/Last 18 0 R
+/A 12 0 R
+>>
+endobj
+13 0 obj
+<<
+/Title (Page 1)
+/Parent 26 0 R
+/Count -1
+/First 14 0 R
+/Last 14 0 R
+/A 12 0 R
+>>
+endobj
+26 0 obj
+<< /Type /Outlines
+   /Count 5
+   /First 13 0 R
+   /Last 13 0 R
+>>
+endobj
+27 0 obj
+<<
+/Type /Catalog
+/Pages 1 0 R
+/Version /1.5
+/PageMode /UseOutlines
+/Outlines 26 0 R
+/Names 4 0 R
+/PageLayout /SinglePage
+>>
+endobj
+xref
+0 28
+0000000000 65535 f 
+0000003189 00000 n 
+0000001657 00000 n 
+0000001770 00000 n 
+0000002620 00000 n 
+0000000015 00000 n 
+0000000709 00000 n 
+0000001791 00000 n 
+0000002086 00000 n 
+0000002381 00000 n 
+0000000728 00000 n 
+0000000764 00000 n 
+0000000968 00000 n 
+0000003710 00000 n 
+0000003606 00000 n 
+0000001015 00000 n 
+0000003449 00000 n 
+0000001078 00000 n 
+0000003534 00000 n 
+0000001142 00000 n 
+0000003375 00000 n 
+0000001204 00000 n 
+0000001311 00000 n 
+0000001426 00000 n 
+0000001538 00000 n 
+0000003249 00000 n 
+0000003810 00000 n 
+0000003893 00000 n 
+trailer
+<< /Size 28 /Root 27 0 R /Info 25 0 R >>
+startxref
+4034
+%%EOF

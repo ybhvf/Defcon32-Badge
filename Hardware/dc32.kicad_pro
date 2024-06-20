@@ -186,7 +186,8 @@
         0.2032,
         0.254,
         0.3048,
-        0.381
+        0.381,
+        0.525
       ],
       "tuning_pattern_settings": {
         "diff_pair_defaults": {
@@ -487,7 +488,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "",
+      "plot": "output",
       "pos_files": "",
       "specctra_dsn": "",
       "step": "dc31.step",
