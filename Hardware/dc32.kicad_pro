@@ -488,7 +488,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "output",
+      "plot": "output/1.0/",
       "pos_files": "",
       "specctra_dsn": "",
       "step": "dc31.step",
