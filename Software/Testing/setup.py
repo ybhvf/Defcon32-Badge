@@ -25,8 +25,8 @@ cs_pin, reset_pin, dc_pin, mosi_pin, clk_pin = (
     board.GP13,
     board.GP9,
     board.GP8,
-    board.GP7,
-    board.GP6,
+    board.GP11,
+    board.GP10,
 )
 displayio.release_displays()
 spi = io.SPI(clock=clk_pin, MOSI=mosi_pin)
