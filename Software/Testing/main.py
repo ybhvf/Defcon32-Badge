@@ -473,7 +473,6 @@ machine.add_state(MenuState())
 machine.add_state(SSTVEncoderState())
 machine.add_state(SSTVDecoderState())
 machine.add_state(PartyState())
-sequencer = run_sequencer()
 
 machine.go_to_state("startup")
 
