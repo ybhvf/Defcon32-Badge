@@ -53,7 +53,7 @@ def menu_select(last_position, menu_items):
             pretty_name = menu_items[index]["pretty"]
             text = str.format("{}: {}", index, pretty_name)
             text_area = label.Label(terminalio.FONT, text=text, x=2, y=15)
-            display.root_group(text_area)
+            display.root_group = text_area
             last_position = current_position
 
         # Select item
@@ -122,7 +122,7 @@ def show_menu(menu, highlight, shift):
             )
             display_group.append(text_item)
         line += 1
-    display.root_group(display_group)
+    display.root_group = display_group
 
 
 # State machine setup
@@ -230,7 +230,7 @@ class StartupState(State):
             if len(text) > self.timer:
                 text = text[0 : self.timer]
             text_area = label.Label(terminalio.FONT, text=text, x=2, y=5)
-            display.root_group(text_area)
+            display.root_group = text_area
             self.color = (self.timer, self.timer, 0)
             if self.timer > (len(text) * 1.5):
                 self.timer = 0
@@ -240,7 +240,7 @@ class StartupState(State):
             if len(text) > self.timer:
                 text = text[0 : self.timer]
             text_area = label.Label(terminalio.FONT, text=text, x=2, y=10)
-            display.root_group(text_area)
+            display.root_group = text_area
             if self.timer > (len(text) * 1.5):
                 self.timer = 0
                 self.stage = 2
@@ -346,7 +346,7 @@ class SSTVEncoderState(State):
         # SSTV Encoder code
         text = "SSTV Encoder"
         text_area = label.Label(terminalio.FONT, text=text, x=2, y=15)
-        display.root_group(text_area)
+        display.root_group = text_area
         enc_buttons_event = enc_buttons.events.get()
         if enc_buttons_event and enc_buttons_event.pressed:
             machine.go_to_state("menu")
@@ -367,7 +367,7 @@ class SSTVDecoderState(State):
         # SSTV Encoder code
         text = "SSTV Decoder"
         text_area = label.Label(terminalio.FONT, text=text, x=2, y=15)
-        display.root_group(text_area)
+        display.root_group = text_area
         enc_buttons_event = enc_buttons.events.get()
         if enc_buttons_event and enc_buttons_event.pressed:
             machine.go_to_state("menu")
