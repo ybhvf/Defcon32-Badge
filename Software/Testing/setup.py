@@ -67,6 +67,6 @@ except:
 # Setup audio
 # This may need to get moved into main.py, had issues with this in setup.py on DC31 badge
 audio_out = audiobusio.I2SOut(board.GP0, board.GP1, board.GP2)
-# audio_in = audiobusio.PDMIn(
-    board.MICROPHONE_CLOCK, board.MICROPHONE_DATA, sample_rate=16000, bit_depth=16
+ audio_in = audiobusio.PDMIn(
+    board.GP0, board.GP2, sample_rate=16000, bit_depth=16
 )
