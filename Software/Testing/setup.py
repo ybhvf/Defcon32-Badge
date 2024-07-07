@@ -61,7 +61,7 @@ try:
 except:
     text = "No SD Card Found!"
     text_area = label.Label(terminalio.FONT, text=text, color=0xFFFF00, x=2, y=15)
-    display.show(text_area)
+    display.root_group(text_area)
     time.sleep(5)
 
 # Setup audio
