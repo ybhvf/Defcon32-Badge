@@ -33,7 +33,7 @@ spi = io.SPI(clock=clk_pin, MOSI=mosi_pin)
 display_bus = displayio.FourWire(
     spi, command=dc_pin, chip_select=cs_pin, reset=reset_pin
 )
-display = adafruit_ili9341.ILI9341(display_bus, width=320, height=240, rotation=90)
+display = adafruit_ili9341.ILI9341(display_bus, width=320, height=240, rotation=180)
 
 # Neopixels
 pixel_pin = board.GP14

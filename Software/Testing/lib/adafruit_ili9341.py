@@ -107,7 +107,7 @@ class ILI9341(BusDisplay):
             )
         else:
             init_sequence += (
-                b"\x36\x01\x38"  # _MADCTL Default rotation plus RGB encoding
+                b"\x36\x00\x38"  # _MADCTL Default rotation plus RGB encoding
             )
         if invert:
             init_sequence += b"\x21\x00"  # _INVON
