@@ -6,6 +6,8 @@ from setup import (
 )
 
 # from os import listdir
+import array
+import math
 import displayio
 import terminalio
 from adafruit_display_text import label
@@ -16,6 +18,7 @@ import board
 import audiobusio
 
 # import audiocore
+from audiocore import RawSample
 import audiomixer
 from adafruit_led_animation.animation.rainbow import Rainbow
 from adafruit_led_animation.animation.rainbowchase import RainbowChase
@@ -23,16 +26,6 @@ from adafruit_led_animation.animation.rainbowcomet import RainbowComet
 from adafruit_led_animation.animation.rainbowsparkle import RainbowSparkle
 from adafruit_led_animation.animation.sparklepulse import SparklePulse
 
-
-# Setup audio
-audio = audiobusio.I2SOut(board.GP0, board.GP1, board.GP2)
-mixer = audiomixer.Mixer(
-    voice_count=1,
-    sample_rate=16000,
-    channel_count=1,
-    bits_per_sample=16,
-    samples_signed=True,
-)
 
 
 # Menu code from DC31 Badge
@@ -245,11 +238,11 @@ class StartupState(State):
                 self.timer = 0
                 self.stage = 2
         else:
-            if self.timer < (255 * 8):
+            if self.timer < (255 * 18):
                 color = (0, self.timer % 255, 0)
                 neopixels[self.timer // 255] = color
                 neopixels.show()
-                self.timer = self.timer + 1  # make it faster
+                self.timer = self.timer + 9  # make it faster
             else:
                 time.sleep(0.1)
                 machine.go_to_state("menu")
@@ -337,9 +330,23 @@ class SSTVEncoderState(State):
         return "sstv_encoder"
 
     def enter(self, machine):
+        # Setup audio_out
+        self.audio_out = audiobusio.I2SOut(board.GP0, board.GP1, board.GP2)
+
+        # Generate test tone for debug
+        tone_volume = 0.3  # Increase this to increase the volume of the tone.
+        frequency = 440  # Set this to the Hz of the tone you want to generate.
+        length = 8000 // frequency
+        sine_wave = array.array("H", [0] * length)
+        for i in range(length):
+            sine_wave[i] = int((1 + math.sin(math.pi * 2 * i / length)) * tone_volume * (2 ** 15 - 1))
+        self.sine_wave_sample = RawSample(sine_wave)
+
         State.enter(self, machine)
 
     def exit(self, machine):
+        # Release audio_out
+        self.audio_out.deinit()
         State.exit(self, machine)
 
     def update(self, machine):
@@ -347,6 +354,11 @@ class SSTVEncoderState(State):
         text = "SSTV Encoder"
         text_area = label.Label(terminalio.FONT, text=text, x=2, y=15)
         display.root_group = text_area
+
+        self.audio_out.play(self.sine_wave_sample, loop=True)
+        time.sleep(1)
+        self.audio_out.stop()
+
         enc_buttons_event = enc_buttons.events.get()
         if enc_buttons_event and enc_buttons_event.pressed:
             machine.go_to_state("menu")
@@ -364,7 +376,7 @@ class SSTVDecoderState(State):
         State.exit(self, machine)
 
     def update(self, machine):
-        # SSTV Encoder code
+        # SSTV Decoder code
         text = "SSTV Decoder"
         text_area = label.Label(terminalio.FONT, text=text, x=2, y=15)
         display.root_group = text_area
