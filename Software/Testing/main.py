@@ -6,16 +6,6 @@ from setup import (
 )
 
 
-# Encoder test
-from __future__ import division, with_statement
-from math import sin, pi
-from random import random
-from contextlib import closing
-from itertools import cycle, chain
-from array import array
-import wave
-
-
 # from os import listdir
 import array
 import math
