@@ -5,6 +5,17 @@ from setup import (
     encoder,
 )
 
+
+# Encoder test
+from __future__ import division, with_statement
+from math import sin, pi
+from random import random
+from contextlib import closing
+from itertools import cycle, chain
+from array import array
+import wave
+
+
 # from os import listdir
 import array
 import math
@@ -12,6 +23,7 @@ import displayio
 import terminalio
 from adafruit_display_text import label
 import time
+import adafruit_imageload
 
 # from supervisor import ticks_ms
 import board
@@ -267,6 +279,10 @@ class MenuState(State):
             "pretty": "SSTV Decoder",
         },
         {
+            "name": "image_display",
+            "pretty": "Display Image",
+        },
+        {
             "name": "startup",
             "pretty": "Startup State (test)",
         },
@@ -479,12 +495,44 @@ class PartyState(State):
             )
 
 
+class ImageDisplay(State):
+    @property
+    def name(self):
+        return "image_display"
+
+    def enter(self, machine):
+        # Setup the file as the bitmap data source
+        bitmap = displayio.OnDiskBitmap("/tiger.bmp")
+        print(bitmap)
+
+        # Create a TileGrid to hold the bitmap
+        tile_grid = displayio.TileGrid(bitmap, pixel_shader=bitmap.pixel_shader)
+
+        # Create a Group to hold the TileGrid
+        group = displayio.Group()
+
+        # Add the TileGrid to the Group
+        group.append(tile_grid)
+
+        # Add the Group to the Display
+        display.root_group = group
+        State.enter(self, machine)
+
+    def exit(self, machine):
+        State.exit(self, machine)
+
+    def update(self, machine):
+        enc_buttons_event = enc_buttons.events.get()
+        if enc_buttons_event and enc_buttons_event.pressed:
+            machine.go_to_state("menu")
+
 machine = StateMachine()
 machine.add_state(StartupState())
 machine.add_state(MenuState())
 machine.add_state(SSTVEncoderState())
 machine.add_state(SSTVDecoderState())
 machine.add_state(PartyState())
+machine.add_state(ImageDisplay())
 
 machine.go_to_state("startup")
 
