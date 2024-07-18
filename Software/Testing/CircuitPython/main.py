@@ -5,17 +5,22 @@ from setup import (
     encoder,
 )
 
+
 # from os import listdir
+import array
+import math
 import displayio
 import terminalio
 from adafruit_display_text import label
 import time
+import adafruit_imageload
 
 # from supervisor import ticks_ms
 import board
 import audiobusio
 
 # import audiocore
+from audiocore import RawSample
 import audiomixer
 from adafruit_led_animation.animation.rainbow import Rainbow
 from adafruit_led_animation.animation.rainbowchase import RainbowChase
@@ -23,16 +28,6 @@ from adafruit_led_animation.animation.rainbowcomet import RainbowComet
 from adafruit_led_animation.animation.rainbowsparkle import RainbowSparkle
 from adafruit_led_animation.animation.sparklepulse import SparklePulse
 
-
-# Setup audio
-audio = audiobusio.I2SOut(board.GP0, board.GP1, board.GP2)
-mixer = audiomixer.Mixer(
-    voice_count=1,
-    sample_rate=16000,
-    channel_count=1,
-    bits_per_sample=16,
-    samples_signed=True,
-)
 
 
 # Menu code from DC31 Badge
@@ -53,7 +48,7 @@ def menu_select(last_position, menu_items):
             pretty_name = menu_items[index]["pretty"]
             text = str.format("{}: {}", index, pretty_name)
             text_area = label.Label(terminalio.FONT, text=text, x=2, y=15)
-            display.root_group(text_area)
+            display.root_group = text_area
             last_position = current_position
 
         # Select item
@@ -122,7 +117,7 @@ def show_menu(menu, highlight, shift):
             )
             display_group.append(text_item)
         line += 1
-    display.root_group(display_group)
+    display.root_group = display_group
 
 
 # State machine setup
@@ -230,7 +225,7 @@ class StartupState(State):
             if len(text) > self.timer:
                 text = text[0 : self.timer]
             text_area = label.Label(terminalio.FONT, text=text, x=2, y=5)
-            display.root_group(text_area)
+            display.root_group = text_area
             self.color = (self.timer, self.timer, 0)
             if self.timer > (len(text) * 1.5):
                 self.timer = 0
@@ -240,16 +235,16 @@ class StartupState(State):
             if len(text) > self.timer:
                 text = text[0 : self.timer]
             text_area = label.Label(terminalio.FONT, text=text, x=2, y=10)
-            display.root_group(text_area)
+            display.root_group = text_area
             if self.timer > (len(text) * 1.5):
                 self.timer = 0
                 self.stage = 2
         else:
-            if self.timer < (255 * 8):
+            if self.timer < (255 * 18):
                 color = (0, self.timer % 255, 0)
                 neopixels[self.timer // 255] = color
                 neopixels.show()
-                self.timer = self.timer + 1  # make it faster
+                self.timer = self.timer + 9  # make it faster
             else:
                 time.sleep(0.1)
                 machine.go_to_state("menu")
@@ -272,6 +267,10 @@ class MenuState(State):
         {
             "name": "sstv_decoder",
             "pretty": "SSTV Decoder",
+        },
+        {
+            "name": "image_display",
+            "pretty": "Display Image",
         },
         {
             "name": "startup",
@@ -337,16 +336,35 @@ class SSTVEncoderState(State):
         return "sstv_encoder"
 
     def enter(self, machine):
+        # Setup audio_out
+        self.audio_out = audiobusio.I2SOut(board.GP0, board.GP1, board.GP2)
+
+        # Generate test tone for debug
+        tone_volume = 0.3  # Increase this to increase the volume of the tone.
+        frequency = 440  # Set this to the Hz of the tone you want to generate.
+        length = 8000 // frequency
+        sine_wave = array.array("H", [0] * length)
+        for i in range(length):
+            sine_wave[i] = int((1 + math.sin(math.pi * 2 * i / length)) * tone_volume * (2 ** 15 - 1))
+        self.sine_wave_sample = RawSample(sine_wave)
+
         State.enter(self, machine)
 
     def exit(self, machine):
+        # Release audio_out
+        self.audio_out.deinit()
         State.exit(self, machine)
 
     def update(self, machine):
         # SSTV Encoder code
         text = "SSTV Encoder"
         text_area = label.Label(terminalio.FONT, text=text, x=2, y=15)
-        display.root_group(text_area)
+        display.root_group = text_area
+
+        self.audio_out.play(self.sine_wave_sample, loop=True)
+        time.sleep(1)
+        self.audio_out.stop()
+
         enc_buttons_event = enc_buttons.events.get()
         if enc_buttons_event and enc_buttons_event.pressed:
             machine.go_to_state("menu")
@@ -364,10 +382,10 @@ class SSTVDecoderState(State):
         State.exit(self, machine)
 
     def update(self, machine):
-        # SSTV Encoder code
+        # SSTV Decoder code
         text = "SSTV Decoder"
         text_area = label.Label(terminalio.FONT, text=text, x=2, y=15)
-        display.root_group(text_area)
+        display.root_group = text_area
         enc_buttons_event = enc_buttons.events.get()
         if enc_buttons_event and enc_buttons_event.pressed:
             machine.go_to_state("menu")
@@ -467,12 +485,44 @@ class PartyState(State):
             )
 
 
+class ImageDisplay(State):
+    @property
+    def name(self):
+        return "image_display"
+
+    def enter(self, machine):
+        # Setup the file as the bitmap data source
+        bitmap = displayio.OnDiskBitmap("/tiger.bmp")
+        print(bitmap)
+
+        # Create a TileGrid to hold the bitmap
+        tile_grid = displayio.TileGrid(bitmap, pixel_shader=bitmap.pixel_shader)
+
+        # Create a Group to hold the TileGrid
+        group = displayio.Group()
+
+        # Add the TileGrid to the Group
+        group.append(tile_grid)
+
+        # Add the Group to the Display
+        display.root_group = group
+        State.enter(self, machine)
+
+    def exit(self, machine):
+        State.exit(self, machine)
+
+    def update(self, machine):
+        enc_buttons_event = enc_buttons.events.get()
+        if enc_buttons_event and enc_buttons_event.pressed:
+            machine.go_to_state("menu")
+
 machine = StateMachine()
 machine.add_state(StartupState())
 machine.add_state(MenuState())
 machine.add_state(SSTVEncoderState())
 machine.add_state(SSTVDecoderState())
 machine.add_state(PartyState())
+machine.add_state(ImageDisplay())
 
 machine.go_to_state("startup")
 

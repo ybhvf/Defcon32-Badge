@@ -25,15 +25,15 @@ cs_pin, reset_pin, dc_pin, mosi_pin, clk_pin = (
     board.GP13,
     board.GP9,
     board.GP8,
-    board.GP7,
-    board.GP6,
+    board.GP11,
+    board.GP10,
 )
 displayio.release_displays()
 spi = io.SPI(clock=clk_pin, MOSI=mosi_pin)
 display_bus = displayio.FourWire(
     spi, command=dc_pin, chip_select=cs_pin, reset=reset_pin
 )
-display = adafruit_ili9341.ILI9341(display_bus, width=320, height=240, rotation=90)
+display = adafruit_ili9341.ILI9341(display_bus, width=320, height=240, rotation=180)
 
 # Neopixels
 pixel_pin = board.GP14
@@ -61,12 +61,10 @@ try:
 except:
     text = "No SD Card Found!"
     text_area = label.Label(terminalio.FONT, text=text, color=0xFFFF00, x=2, y=15)
-    display.root_group(text_area)
-    time.sleep(5)
+    display.root_group = text_area
+    time.sleep(2)
 
 # Setup audio
-# This may need to get moved into main.py, had issues with this in setup.py on DC31 badge
-audio_out = audiobusio.I2SOut(board.GP0, board.GP1, board.GP2)
-audio_in = audiobusio.PDMIn(
-    board.MICROPHONE_CLOCK, board.MICROPHONE_DATA, sample_rate=16000, bit_depth=16
-)
+# audio_in = audiobusio.PDMIn(
+#     board.GP21, board.GP20, sample_rate=16000, bit_depth=16
+# )
