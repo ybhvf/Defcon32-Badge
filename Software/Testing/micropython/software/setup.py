@@ -6,9 +6,13 @@ from machine import SPI
 from sdcard import SDCard
 from ili9341 import Display
 from rotary_irq_rp2 import RotaryIRQ
+from xglcd_font import XglcdFont
 
 # Setup neopixels
 neopixels = neopixel.NeoPixel(Pin(14), 18)
+
+# Load font
+unispace = XglcdFont('fonts/Unispace12x24.c', 12, 24)
 
 # Setup display
 disp_spi = SPI(1, baudrate=40000000, sck=Pin(10), mosi=Pin(11))
