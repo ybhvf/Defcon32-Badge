@@ -2,9 +2,9 @@ import os
 import neopixel
 from machine import Pin
 from machine import SPI
-
+from time import sleep
 from sdcard import SDCard
-from ili9341 import Display
+from ili9341 import Display, color565
 from rotary_irq_rp2 import RotaryIRQ
 from xglcd_font import XglcdFont
 
@@ -42,7 +42,20 @@ sd_spi = SPI(
     mosi=Pin(7),
     miso=Pin(4),
 )
-
-sd = SDCard(sd_spi, cs)
-sd.init_spi(25_000_000)  # increase SPI bus speed to SD card
-os.mount(sd, "/sd")
+try:
+    sd = SDCard(sd_spi, cs)
+    sd.init_spi(25_000_000)  # increase SPI bus speed to SD card
+    os.mount(sd, "/sd")
+    sd_state = True
+except:
+    display.clear()
+    display.draw_text(0, 0, 'No SD card found!', unispace,
+                  color565(255, 255, 255))
+    display.draw_text(0, 48, 'Some functionality will be', unispace,
+                  color565(255, 255, 255))
+    display.draw_text(0, 72, 'borked.', unispace,
+                  color565(255, 255, 255))
+    sd_state = False
+    sleep(4)
+    
+    

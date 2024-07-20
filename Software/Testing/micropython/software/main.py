@@ -19,8 +19,10 @@ import os
 import time
 from ili9341 import color565
 from machine import Pin, I2S, SPI
-from sdcard import SDCard
-from setup import sd_spi, display, sd, rotary_enc, neopixels, button, unispace
+from setup import display, sd_state, rotary_enc, neopixels, button, unispace
+if sd_state is True:
+    from setup import sd_spi, sd
+    from sdcard import SDCard
 from state import State, StateMachine
 from state_image import ImageDisplayState
 from state_menu import MenuState
