@@ -73,8 +73,6 @@ class MenuState(State):
         if self.last_position != position:
             show_select(self.menu_items, position - self.shift, self.shift)
             self.last_position = position
-            print(position)
-            print(self.shift)
 
         if button.value() is 0:
             machine.go_to_state(self.menu_items[position + self.shift]["name"])
@@ -117,7 +115,8 @@ def show_menu(menu, highlight, shift):
 
     # Shift the list of files so that it shows on the display
     short_list = []
-    for index in range(shift, shift + total_lines):
+    list_max = min(shift + total_lines, len(menu))
+    for index in range(shift, list_max):
         try:
             short_list.append(menu[index]["pretty"])
         except IndexError:
@@ -146,7 +145,8 @@ def show_select(menu, highlight, shift):
 
     # Shift the list of files so that it shows on the display
     short_list = []
-    for index in range(shift, shift + total_lines):
+    list_max = min(shift + total_lines, len(menu))
+    for index in range(shift, list_max):
         try:
             short_list.append(menu[index]["pretty"])
         except IndexError:
