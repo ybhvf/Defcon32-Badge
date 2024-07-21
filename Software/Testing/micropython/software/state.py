@@ -1,4 +1,6 @@
+import time
 from setup import rotary_enc
+
 
 class State(object):
     def __init__(self):
@@ -9,6 +11,7 @@ class State(object):
         return ""
 
     def enter(self, core_machine):
+        time.sleep_ms(300)
         pass
 
     def exit(self, core_machine):
@@ -16,6 +19,7 @@ class State(object):
 
     def update(self, core_machine):
         return True
+
 
 class StateMachine(object):
     def __init__(self):
