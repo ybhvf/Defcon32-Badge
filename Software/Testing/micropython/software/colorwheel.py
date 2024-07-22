@@ -11,7 +11,7 @@ Not supported by all boards.
 """
 
 
-def colorwheel(color_value):
+def colorwheel(color_value, max_brightness=255):
     """
     A colorwheel. ``0`` and ``255`` are red, ``85`` is green, and ``170`` is blue, with the values
     between being the rest of the rainbow.
@@ -38,4 +38,8 @@ def colorwheel(color_value):
         r = int(color_value)
         g = 0
         b = int(85 - color_value)
+
+    r = int((r / 85.0) * max_brightness)
+    g = int((g / 85.0) * max_brightness)
+    b = int((b / 85.0) * max_brightness)
     return [r, g, b]

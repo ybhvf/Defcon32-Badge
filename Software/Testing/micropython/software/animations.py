@@ -2,6 +2,8 @@ import time
 from setup import neopixels
 from colorwheel import colorwheel
 
+max_brightness = 20
+
 
 class AnimationChilePulse:
     def __init__(self):
@@ -10,25 +12,24 @@ class AnimationChilePulse:
         self.green = True
 
     def animate(self):
-        if self.counter > 20:
-            self.bounce = 1
-        elif self.counter <= 1:
-            self.bounce = 0
-            self.green = self.green ^ True
+        timer = (time.ticks_ms() / 20) % 255
+        if timer < self.counter:
+            self.green = not self.green
+        self.counter = timer
 
-        if self.bounce is 0:
-            self.counter += 1
-        else:
-            self.counter -= 1
+        intensity = timer
+        if intensity > 127:
+            intensity = 127 - (intensity - 127)
+
+        intensity = int((intensity / 127) * max_brightness)
 
         if self.green:
             for value in range(0, 18):
-                neopixels[value] = [self.counter, 0, 0]
+                neopixels[value] = [intensity, 0, 0]
         else:
             for value in range(0, 18):
-                neopixels[value] = [0, self.counter, 0]
+                neopixels[value] = [0, intensity, 0]
         neopixels.write()
-        time.sleep_ms(50)
 
 
 class AnimationRainbow:
@@ -36,16 +37,27 @@ class AnimationRainbow:
         self.counter = 0
 
     def animate(self):
-        if self.counter > 255:
-            self.counter = 0
+        self.counter = (time.ticks_ms() / 20) % 255
 
-        temp = colorwheel(self.counter)
+        temp = colorwheel(self.counter, max_brightness)
         for value in range(0, 18):
             neopixels[value] = temp
 
         neopixels.write()
-        self.counter += 1
-        time.sleep_ms(10)
+
+
+class AnimationRainbowPulse:
+    def __init__(self):
+        self.counter = 0
+
+    def animate(self, intensity):
+        self.counter = (time.ticks_ms() / 20) % 255
+
+        temp = colorwheel(self.counter, intensity)
+        for value in range(0, 18):
+            neopixels[value] = temp
+
+        neopixels.write()
 
 
 class AnimationRainbowChase:
@@ -53,16 +65,15 @@ class AnimationRainbowChase:
         self.counter = 0
 
     def animate(self):
-        if self.counter > 255:
-            self.counter = 0
+        timer = time.ticks_ms()
+        color = (timer / 20) % 255
 
-        temp = colorwheel(self.counter % 255)
+        temp = colorwheel(color, max_brightness)
         for value in range(0, 18):
-            if value == (self.counter % 18):
+            if value == (int(timer / 20) % 18):
                 neopixels[value] = temp
             else:
                 neopixels[value] = [0, 0, 0]
 
         neopixels.write()
         self.counter += 1
-        time.sleep_ms(20)
