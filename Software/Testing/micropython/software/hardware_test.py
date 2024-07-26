@@ -197,12 +197,34 @@ def speaker_test():
     audio_out.deinit()
     print("Done")
     
+def encoder_test():
+    display.clear()
+    display.draw_text(0, 0, 'Encoder Test', unispace,
+        color565(255, 255, 255))
+    display.draw_text(0, 24, 'Spin Encoder', unispace,
+        color565(255, 255, 255))
+    display.draw_text(0, 72, 'Push Encoder to Exit', unispace,
+        color565(255, 255, 255))
+    rotary_enc.reset()
+    current_enc_value = rotary_enc.value()
+    test_running = True
+    while test_running is True:
+        value = rotary_enc.value()
+        if current_enc_value != value:
+            current_enc_value = value
+            display.draw_text(0, 48, str(value), unispace,
+                color565(255, 255, 255))
+        
+        # Generate a valid index from the position
+        if button.value() is 0:
+            test_running = False
     
 # Run tests
 screen_test(1)
 led_test(1)
 mic_test()
 speaker_test()
+encoder_test()
 
 display.clear()
 display.draw_text(0, 0, 'Test Complete', unispace,
