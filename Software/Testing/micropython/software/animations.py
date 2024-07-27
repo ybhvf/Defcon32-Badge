@@ -2,7 +2,7 @@ import time
 from setup import neopixels
 from colorwheel import colorwheel
 
-max_brightness = 20
+max_brightness = 100
 
 
 class AnimationChilePulse:

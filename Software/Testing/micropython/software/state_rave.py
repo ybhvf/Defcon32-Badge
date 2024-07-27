@@ -1,5 +1,6 @@
 import time
-from animations import AnimationChilePulse, AnimationRainbow, AnimationRainbowChase
+import struct
+from animations import AnimationRainbowPulse
 from ili9341 import color565
 from setup import button, display, neopixels, unispace
 from state import State
@@ -13,10 +14,11 @@ class RaveState(State):
 
     def __init__(self):
         self.counter = 0
-        self.bounce = 0
+        self.previous_intensity = 0
+        self.max_intensity = 0
         self.green = True
-        self.animation = AnimationRainbow()
-        self.mic_samples = bytearray(2)
+        self.animation = AnimationRainbowPulse()
+        self.mic_samples = bytearray(4)
         self.mic_samples_mv = memoryview(self.mic_samples)
 
     def enter(self, machine):
@@ -34,8 +36,8 @@ class RaveState(State):
             mode=I2S.RX,
             bits=16,
             format=I2S.MONO,
-            rate=8000,
-            ibuf=600,
+            rate=22000,
+            ibuf=150,
         )
         State.enter(self, machine)
 
@@ -44,13 +46,26 @@ class RaveState(State):
         State.exit(self, machine)
 
     def update(self, machine):
+        self.counter = self.counter + 1
         if button.value() is 0:
             machine.go_to_state("menu")
 
         num_bytes_read_from_mic = self.audio_in.readinto(self.mic_samples_mv)
         # if num_bytes_read_from_mic > 0:
         #    print(self.mic_samples)
-        for value in range(0, 18):
-            neopixels[value] = [0, self.mic_samples[0], 0]
-        neopixels.write()
-        time.sleep_ms(10)
+        total = struct.unpack("<h", self.mic_samples)
+        intensity = int(abs(total[0]) / 32)
+        # if (self.counter % 100) == 0:
+        #    print(self.counter)
+        #    print(intensity)
+        #    print(self.max_intensity)
+        # if intensity > self.max_intensity:
+        #    self.max_intensity = intensity
+        if intensity > 200:
+            intensity = 200
+        if (intensity > 0) and (intensity != self.previous_intensity):
+            self.previous_intensity = intensity
+            self.animation.animate(intensity)
+            # for value in range(0, 18):
+            #    neopixels[value] = [0, intensity, 0]
+            #    neopixels.write()
