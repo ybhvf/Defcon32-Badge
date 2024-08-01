@@ -2,9 +2,10 @@ import time
 import struct
 from animations import AnimationRainbowPulse
 from ili9341 import color565
-from setup import button, display, neopixels, unispace
+from setup import button, display, neopixels, rotary_enc, unispace
 from state import State
 from machine import Pin, I2S
+import math
 
 
 class RaveState(State):
@@ -16,6 +17,8 @@ class RaveState(State):
         self.counter = 0
         self.previous_intensity = 0
         self.max_intensity = 0
+        self.knob = 0
+        self.volume = 1
         self.green = True
         self.animation = AnimationRainbowPulse()
         self.mic_samples = bytearray(4)
@@ -24,6 +27,13 @@ class RaveState(State):
     def enter(self, machine):
         display.clear()
         display.draw_text(0, 0, "Rave Mode", unispace, color565(255, 255, 255))
+        display.draw_text(
+            0,
+            30,
+            "Volume: {}   ".format(self.knob),
+            unispace,
+            color565(255, 255, 255),
+        )
         for value in range(0, 18):
             neopixels[value] = [4, 0, 0]
         neopixels.write()
@@ -49,23 +59,27 @@ class RaveState(State):
         self.counter = self.counter + 1
         if button.value() is 0:
             machine.go_to_state("menu")
+            return
 
         num_bytes_read_from_mic = self.audio_in.readinto(self.mic_samples_mv)
-        # if num_bytes_read_from_mic > 0:
-        #    print(self.mic_samples)
         total = struct.unpack("<h", self.mic_samples)
-        intensity = int(abs(total[0]) / 32)
-        # if (self.counter % 100) == 0:
-        #    print(self.counter)
-        #    print(intensity)
-        #    print(self.max_intensity)
-        # if intensity > self.max_intensity:
-        #    self.max_intensity = intensity
+        new_knob = rotary_enc.value()
+        if new_knob < 0:
+            new_knob = 0
+        if new_knob != self.knob:
+            self.knob = new_knob
+            self.volume = math.pow(2, self.knob)
+            # print(self.volume)
+            display.draw_text(
+                0,
+                30,
+                "Volume: {}   ".format(new_knob),
+                unispace,
+                color565(255, 255, 255),
+            )
+        intensity = int(abs(total[0]) / self.volume)
         if intensity > 200:
             intensity = 200
         if (intensity > 0) and (intensity != self.previous_intensity):
             self.previous_intensity = intensity
             self.animation.animate(intensity)
-            # for value in range(0, 18):
-            #    neopixels[value] = [0, intensity, 0]
-            #    neopixels.write()
