@@ -25,7 +25,7 @@ core_machine.add_state(PartyState())
 core_machine.add_state(ImageDisplayState())
 core_machine.add_state(RaveState())
 
-core_machine.go_to_state("startup")
+core_machine.go_to_state("menu")
 
 while True:
     core_machine.update()

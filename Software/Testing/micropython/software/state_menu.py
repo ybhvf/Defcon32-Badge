@@ -80,4 +80,4 @@ class MenuState(State):
             self.last_position = position
 
         if button.value() is 0:
-            machine.go_to_state(self.menu_items[position + self.shift]["name"])
+            machine.go_to_state(self.menu_items[self.last_position]["name"])
