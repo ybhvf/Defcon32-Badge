@@ -82,7 +82,7 @@ def show_select(menu, highlight, shift):
                 line * line_height,
                 ">",
                 unispace,
-                color565(255, 255, 255),
+                color565(255, 0, 0),
                 background=color565(0, 0, 0),
             )
         else:
