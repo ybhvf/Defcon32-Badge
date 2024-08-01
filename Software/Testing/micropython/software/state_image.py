@@ -18,7 +18,6 @@ class ImageDisplayState(State):
             print("No SD Card Images")
             files = []
 
-        print(files)
         for file in files:
             if file.endswith(".raw") and (not file.startswith(".")):
                 raw_files.append({"name": "/sd/images/{}".format(file), "pretty": file})
@@ -52,7 +51,6 @@ class ImageDisplayState(State):
 
     def update(self, machine):
         if button.value() is 0:  # Button Press
-            print("toggle")
             display.clear()
             self.menu = not self.menu
             if self.menu:
@@ -61,7 +59,9 @@ class ImageDisplayState(State):
                 time.sleep_ms(100)
                 return
             else:
-                selection = self.menu_items[self.last_position + self.shift]["name"]
+                print(self.last_position)
+                print(self.shift)
+                selection = self.menu_items[self.last_position]["name"]
                 if selection == "menu":
                     machine.go_to_state("menu")
                     return

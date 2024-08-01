@@ -66,6 +66,14 @@ class RaveState(State):
         new_knob = rotary_enc.value()
         if new_knob < 0:
             new_knob = 0
+            rotary_enc.set(value=0)
+        if new_knob > 40:  # Make rolling over from 0 to 32 possible
+            new_knob = 32
+            rotary_enc.set(value=32)
+        if new_knob > 32:  # Make rolling from 32 to 0 possible
+            new_knob = 0
+            rotary_enc.set(value=0)
+
         if new_knob != self.knob:
             self.knob = new_knob
             self.volume = math.pow(2, self.knob)
