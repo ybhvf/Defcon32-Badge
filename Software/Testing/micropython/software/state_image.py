@@ -13,11 +13,12 @@ class ImageDisplayState(State):
     def __init__(self):
         raw_files = []
         try:
-            files = listdir("/sd/images/")
+            files = listdir("/sd/images")
         except Exception as e:
             print("No SD Card Images")
             files = []
 
+        print(files)
         for file in files:
             if file.endswith(".raw") and (not file.startswith(".")):
                 raw_files.append({"name": "/sd/images/{}".format(file), "pretty": file})
