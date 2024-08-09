@@ -29,8 +29,13 @@ Powered by not one, not two, but three, _three_ AAA batteries! Endless Power! (\
 
 
 # Build Guide
-Put slot a into tab b. 
-More coming soon.
+If you need to teardown the badge, please see the full BuildGuide.md in the repo. For defcon badges, you will need to add the rotary encoder, battery pack, and flash the firmware.
+
+First put the rotary encoder through the hole on the front of they board. Solder on all the pins and stabilization tabs on the back of the board. Then remove the double sticky tape and secure the battery pack to the board. Next solder the black wire of the battery pack to the negative pad on the back of the board, and the red to the positive.
+
+If you start up the badge with the shipped firmware you should get a test mode to see if everything works. To flash our initial full fimrware, use a non conductive tool to push the white button on the board of the Raspberry pi Pico, and plug it into your computer. A USB Mass storage device should appear. Download the single u2f file from the release section of our github, and drag it onto the drive. The board should then reboot when the transfer is done and you should have a badge!
+
+The initial firmware has a mode with light patterns, a sound reactive "rave" light mode (the knob will control the sensitivity of the microphone), and can show raw formatted images off a SD card. We wanted to implement a SSTV encode and decode, but did not finish in time for con. If you wish to hack on this and submit a PR go for it! 
 
 # Recommended IDEs
 A commodore 64 with a serial to micro USB adapter. If not avaliable, we recommend Visual Studio Code with the MicroPico extension, or the Thonny IDE.
