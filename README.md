@@ -23,7 +23,7 @@ One rotary encoder, with click function. Spared no expsense!
 
 Micro Mechanical Microphone, by TDK!
 
-0.3"? Speaker! Feel the ultra low frequecny response of like, 200 - 400 hz? I dunno, dont enter any DB competitions with the badge.
+0.3"? Speaker!
 
 Powered by not one, not two, but three, _three_ AAA batteries! Endless Power! (\* please note power is not infact endless.)
 
