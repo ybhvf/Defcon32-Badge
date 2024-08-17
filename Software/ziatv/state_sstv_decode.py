@@ -61,6 +61,8 @@ class SSTVDecoderState(State):
             self.run_decoder(machine)
 
     def run_decoder(self, machine):
+            display.clear()
+
             dc = sstv_decode.SSTVDecoder()
             dc.run()
 

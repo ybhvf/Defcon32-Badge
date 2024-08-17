@@ -9,7 +9,7 @@ from ulab import scipy
 # Audio Configuration
 SAMPLE_RATE = 32000
 TIME_STEP = 1 / SAMPLE_RATE
-FRAMES = 20000
+FRAMES = 2000
 
 # Other Constants
 MS = 1. / 1000.
@@ -48,6 +48,7 @@ def bandpass(stream):
 
     for chunk in stream:
         data, zi = scipy.signal.sosfilt(filt, chunk, zi=zi)
+        del chunk
         for x in data:
             yield x
 
@@ -132,7 +133,7 @@ class Microphone:
             bits=16,
             format=I2S.MONO,
             rate=self.sample_rate,
-            ibuf=self.frames,
+            ibuf=self.sample_rate,
         )
 
     def read(self):
@@ -222,7 +223,5 @@ class SSTVDecoder:
         self.expect_tone(1200, 30*MS) # stop bit
 
         print("vis:", vis)
-
-        display.clear()
 
         self.read_s1()

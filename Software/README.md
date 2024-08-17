@@ -1,6 +1,6 @@
-# dczia defcon32 badge
+# dczia defcon32 badge -- software
 
-## Compiling
+## compiling
 
 ```bash
 make submodules
