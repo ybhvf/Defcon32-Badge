@@ -82,9 +82,8 @@ static mp_obj_t sstv_Dem_read(mp_obj_t self_in, mp_obj_t length_obj) {
 static mp_obj_t sstv_Dem_expect(mp_obj_t self_in, mp_obj_t freq_obj,
                                 mp_obj_t length_obj) {
   sstv_Dem_obj_t *self = MP_OBJ_TO_PTR(self_in);
-  dem_read(&self->dem, mp_obj_get_float(length_obj));
-  // dem_expect(&self->dem, mp_obj_get_int(freq_obj),
-  //            mp_obj_get_float(length_obj));
+  dem_expect(&self->dem, mp_obj_get_int(freq_obj),
+             mp_obj_get_float(length_obj));
   return mp_const_none;
 }
 

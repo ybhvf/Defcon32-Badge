@@ -60,12 +60,12 @@ class SSTVDecoder:
     def log(self, msg):
         self.actions.append(msg)
 
-    def _benchmark(self):
+    def _benchmark(self, length=0.25, count=20):
         import time
 
-        for _ in range(20):
+        for _ in range(count):
             now = time.ticks_ms()
-            freq = self.dem.read(0.25)
+            freq = self.dem.read(length)
             print(time.ticks_ms() - now, freq)
 
     def run(self):
@@ -82,9 +82,9 @@ class SSTVDecoder:
             self.log("heard calibration header")
 
             # read VIS code
-            self.dem.expect(1200, 0.03)  # start bit
+            self.dem.read(0.03)  # start bit (1200hz)
             vis = [sstv.bin_freq(self.dem.read(0.03)) for _ in range(8)]
-            self.dem.expect(1200, 0.03)  # stop bit
+            self.dem.read(0.03)  # stop bit (1200hz)
 
             self.log(f"vis: {vis}")
 

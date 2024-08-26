@@ -37,14 +37,11 @@ class SSTVDecoderState(State):
         # clear image when button is pressed
         if self.in_image:
             if button.value() == 0:
-                display.clear()
                 self.in_image = False
-                self.last_position = 0
-                self.shift = 0
-                rotary_enc.reset()
+                display.clear()
                 show_menu(self.menu_items, self.last_position, self.shift)
                 show_select(self.menu_items, self.last_position, self.shift)
-            return True
+            return
 
         # handle rotary update
         if self.last_position != position:
@@ -59,7 +56,7 @@ class SSTVDecoderState(State):
             else:
                 self.run_decoder()
 
-        return True
+        return
 
     def run_decoder(self):
             display.clear()

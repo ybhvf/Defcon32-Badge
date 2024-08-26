@@ -18,7 +18,7 @@ class State(object):
         pass
 
     def update(self, core_machine):
-        return True
+        return
 
 
 class StateMachine(object):

@@ -12,36 +12,31 @@ static const Q7_8 SOS[FILT_SECTIONS][6] = {
 static const filt_state_t filt_state_init = {
     .zi = {{0.30333257, -0.2436163}, {-0.31521611, 0.31521611}}};
 
-static void sos_filt(Q7_8 *chunk, filt_state_t *state) {
+static inline int16_t sos_filt(int16_t sample, filt_state_t *state) {
   // direct-form II iir filter
-  for (uint16_t n = 0; n < FRAMES; n++) {
-    Q7_8 y_n = chunk[n];
-    for (uint16_t s = 0; s < FILT_SECTIONS; s++) {
-      Q7_8 x_n = y_n;
-      y_n = SOS[s][0] * x_n + state->zi[s][0];
-      state->zi[s][0] = SOS[s][1] * x_n - SOS[s][4] * y_n + state->zi[s][1];
-      state->zi[s][1] = SOS[s][2] * x_n - SOS[s][5] * y_n;
-    }
-    chunk[n] = y_n;
+  Q7_8 *y_n = (Q7_8 *)&sample;
+  for (uint16_t s = 0; s < FILT_SECTIONS; s++) {
+    Q7_8 x_n = *y_n;
+    *y_n = SOS[s][0] * x_n + state->zi[s][0];
+    state->zi[s][0] = SOS[s][1] * x_n - SOS[s][4] * *y_n + state->zi[s][1];
+    state->zi[s][1] = SOS[s][2] * x_n - SOS[s][5] * *y_n;
   }
+  return sample;
 }
 
 // Zero-Crossing-Rate Frequency Discrimination
 //////////////////////////////////////////////
 static const zcr_state_t zcr_state_init = {.dt = 0, .last = 0};
 
-static uint16_t zcr(int16_t *chunk, zcr_state_t *state) {
-  uint16_t T_i = 0;
-  for (uint16_t c_i = 0; c_i < FRAMES; c_i++) {
-    if ((chunk[c_i] ^ state->last) < 0) {
-      state->last = chunk[c_i];
-      chunk[T_i] = state->dt;
-      T_i++;
-      state->dt = 0;
-    }
-    state->dt++;
+static inline uint16_t zcr(int16_t sample, zcr_state_t *state) {
+  if ((sample ^ state->last) < 0) {
+    state->last = sample;
+    uint16_t dt = state->dt;
+    state->dt = 1;
+    return dt;
   }
-  return T_i;
+  state->dt++;
+  return 0;
 }
 
 // Demodulator (moDEM)
@@ -64,11 +59,19 @@ static void _dem_process(dem_t *dem) {
   // 1. Fill buffer
   dem->buf = dem->fill_func(dem->fill_arg);
 
-  // 2. Bandpass filter on [1100hz, 2300hz]
-  sos_filt((Q7_8 *)dem->buf, &dem->filt_state);
+  dem->T_len = 0;
+  for (uint16_t i = 0; i < FRAMES; i++) {
+    // 2. Bandpass filter on [1100hz, 2300hz]
+    int16_t sample = sos_filt(dem->buf[i], &dem->filt_state);
 
-  // 3. Demodulate
-  dem->T_len = zcr(dem->buf, &dem->zcr_state);
+    // 3. Demodulate
+    sample = zcr(sample, &dem->zcr_state);
+
+    if (sample > 0) {
+      dem->buf[dem->T_len] = sample;
+      dem->T_len++;
+    }
+  }
   dem->T_i = 0;
 }
 
@@ -114,7 +117,7 @@ void dem_sync(dem_t *dem, uint16_t freq, Q15_16 length) {
   uint16_t min_f = freq - COARSE_HZ, max_f = freq + COARSE_HZ;
 
   // coarse adjustment
-  Q15_16 step = length / 4.0;
+  Q15_16 step = length / (Q15_16)4;
   uint16_t count = 0;
   while (count < 3) {
     uint16_t heard = dem_read(dem, step);
@@ -130,11 +133,19 @@ void dem_sync(dem_t *dem, uint16_t freq, Q15_16 length) {
 }
 
 void dem_expect(dem_t *dem, uint16_t freq, Q15_16 length) {
-  // read most of tone
-  dem_read(dem, 0.8 * length);
+  uint16_t min_f = freq - COARSE_HZ, max_f = freq + COARSE_HZ;
 
-  // fine adjustment
-  _dem_fine_adjust(dem, freq);
+  Q15_16 step = length / (Q15_16)2;
+
+  // read half of tone
+  uint16_t heard = dem_read(dem, step);
+  if ((heard >= min_f) && (heard <= max_f)) {
+    // if we're in the expected tone, do a fine adjustment
+    _dem_fine_adjust(dem, freq);
+  } else {
+    // tone not found! continue free-running
+    dem_read(dem, step);
+  }
 }
 
 // Modulator (MODem)
