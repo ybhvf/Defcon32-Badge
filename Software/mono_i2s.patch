@@ -1,0 +1,15 @@
+diff --git a/ports/rp2/machine_i2s.c b/ports/rp2/machine_i2s.c
+index b17d38336..68b655c15 100644
+--- a/ports/rp2/machine_i2s.c
++++ b/ports/rp2/machine_i2s.c
+@@ -98,8 +98,8 @@ typedef struct _machine_i2s_obj_t {
+ // from DMA memory (32-bit stereo) to the format specified
+ // in the I2S constructor.  e.g.  16-bit mono
+ static const int8_t i2s_frame_map[NUM_I2S_USER_FORMATS][I2S_RX_FRAME_SIZE_IN_BYTES] = {
+-    {-1, -1,  0,  1, -1, -1, -1, -1 },  // Mono, 16-bits
+-    { 0,  1,  2,  3, -1, -1, -1, -1 },  // Mono, 32-bits
++    {-1, -1, -1, -1, -1, -1,  0,  1 },  // Mono, 16-bits
++    {-1, -1, -1, -1,  0,  1,  2,  3 },  // Mono, 32-bits
+     {-1, -1,  0,  1, -1, -1,  2,  3 },  // Stereo, 16-bits
+     { 0,  1,  2,  3,  4,  5,  6,  7 },  // Stereo, 32-bits
+ };

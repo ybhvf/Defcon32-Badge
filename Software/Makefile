@@ -13,7 +13,7 @@ micropython:
 	$(MAKE) -C micropython/mpy-cross
 	$(MAKE) -C micropython/ports/rp2 \
 		BOARD=RPI_PICO \
-		USER_C_MODULES=$(CURDIR)/ulab/code/micropython.cmake \
+		USER_C_MODULES=$(CURDIR)/micropython.cmake \
 		FROZEN_MANIFEST=$(CURDIR)/manifest.py
 
 littlefs: micropython
@@ -28,4 +28,5 @@ littlefs: micropython
 
 submodules:
 	git submodule update --init --checkout
+	cd micropython && git apply ../mono_i2s.patch || true
 	$(MAKE) -C micropython/ports/rp2 submodules

@@ -22,48 +22,49 @@ class SSTVDecoderState(State):
         return "sstv_decoder"
 
     def __init__(self):
-        self.total_lines = 10
-        self.list_length = len(self.menu_items)
-        self.shift = 0
-
-    def enter(self, machine):
-        display.clear()
+        super().__init__()
         self.last_position = 0
         self.shift = 0
-        rotary_enc.reset()
-        show_menu(self.menu_items, self.last_position, self.shift)
-        show_select(self.menu_items, self.last_position, self.shift)
-        State.enter(self, machine)
+        self.in_image = False
 
-    def exit(self, machine):
-        State.exit(self, machine)
+    def enter(self, core_machine):
+        self.run_decoder()
+        super().enter(core_machine)
 
-    def update(self, machine):
-        position = rotary_enc.value()
+    def update(self, core_machine):
+        position = rotary_enc.value() % len(self.menu_items)
 
-        # Don't move decoder past the end of the list
-        if position >= self.list_length:
-            position = self.last_position
-            rotary_enc.set(value=position)
+        # clear image when button is pressed
+        if self.in_image:
+            if button.value() == 0:
+                display.clear()
+                self.in_image = False
+                self.last_position = 0
+                self.shift = 0
+                rotary_enc.reset()
+                show_menu(self.menu_items, self.last_position, self.shift)
+                show_select(self.menu_items, self.last_position, self.shift)
+            return True
 
+        # handle rotary update
         if self.last_position != position:
             show_select(self.menu_items, position - self.shift, self.shift)
             self.last_position = position
 
-        if button.value() is 0:
-            if self.menu_items[position + self.shift]["name"] == "menu":
-                machine.go_to_state("menu")
+        # handle button press
+        if button.value() == 0:
+            selection = self.menu_items[position + self.shift]["name"]
+            if selection == "menu":
+                core_machine.go_to_state("menu")
             else:
-                self.select(self.menu_items[position + self.shift]["name"], machine)
+                self.run_decoder()
 
-    def select(self, selection, machine):
-        if selection == "run_decode":
-            self.run_decoder(machine)
+        return True
 
-    def run_decoder(self, machine):
+    def run_decoder(self):
             display.clear()
 
             dc = sstv_decode.SSTVDecoder()
             dc.run()
 
-            machine.go_to_state("sstv_decoder")
+            self.in_image = True

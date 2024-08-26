@@ -2,10 +2,6 @@
 	path = Software/micropython
 	url = https://github.com/micropython/micropython.git
 	branch = tags/v1.23.0
-[submodule "Software/ulab"]
-	path = Software/ulab
-	url = https://github.com/v923z/micropython-ulab
-	branch = tags/6.5.2
 [submodule "Software/dir2uf2"]
 	path = Software/utils/dir2uf2
 	url = https://github.com/Gadgetoid/dir2uf2.git
