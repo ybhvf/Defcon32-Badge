@@ -1,4 +1,4 @@
-import array
+import micropython
 import _thread
 from collections import deque
 from setup import display, unispace
@@ -13,46 +13,76 @@ class SSTVDecoder:
     def __init__(self):
         self.dem = sstv.Dem()
         self.pixbuf = bytearray(320 * 2)
-        self.actions = deque([],10)
+        self.actions = deque([], 10)
         self.active = False
 
-    def read_s1(self):
-        green = array.array("B", range(320))
-        blue = array.array("B", range(320))
+    def read_scottie(self, lines, columns, pix_dt):
+        green = bytearray(columns)
+        blue = bytearray(columns)
+        red = bytearray(columns)
 
-        self.dem.expect(1200, 0.009)  # SYNC
+        self.dem.read(0.009)  # SYNC @ 1200hz (ignore)
 
-        for x in range(256):
+        for x in range(lines):
             # green
-            self.dem.read(0.0015)  # 1500hz
-            for y in range(320):
-                green[y] = sstv.decode_color(self.dem.read(0.000432))
+            self.dem.read(0.0015)  # 1500hz ref
+            self.dem.read_line(green, pix_dt)
 
             # blue
-            self.dem.read(0.0015)  # 1500hz
-            for y in range(320):
-                blue[y] = sstv.decode_color(self.dem.read(0.000432))
-            self.dem.expect(1200, 0.009)  # SYNC
+            self.dem.read(0.0015)  # 1500hz ref
+            self.dem.read_line(blue, pix_dt)
+            self.dem.read(0.009)  # SYNC @ 1200hz (ignore)
 
             # red
-            self.dem.read(0.0015)  # 1500hz
-            for y in range(320):
-                red = sstv.decode_color(self.dem.read(0.000432))
+            self.dem.read(0.0015)  # 1500hz ref
+            self.dem.read_line(red, pix_dt)
+
+            for y in range(columns):
                 idx = 2 * y
-                self.pixbuf[idx : idx + 2] = color565(red, green[y], blue[y]).to_bytes(
-                    2, "big"
-                )
+                self.pixbuf[idx : idx + 2] = color565(
+                    red[y], green[y], blue[y]
+                ).to_bytes(2, "big")
+
+            self.actions.append(x)
+
+    def read_martin(self, lines, columns, pix_dt):
+        green = bytearray(columns)
+        blue = bytearray(columns)
+        red = bytearray(columns)
+
+        for x in range(lines):
+            self.dem.read(0.004862)  # SYNC @ 1200hz (ignore)
+            self.dem.read(0.000572)  # 1500hz ref
+
+            # green
+            self.dem.read_line(green, pix_dt)
+            self.dem.read(0.000572)  # 1500hz ref
+
+            # blue
+            self.dem.read_line(blue, pix_dt)
+            self.dem.read(0.000572)  # 1500hz ref
+
+            # red
+            self.dem.read_line(red, pix_dt)
+            self.dem.read(0.000572)  # 1500hz ref
+
+            for y in range(columns):
+                idx = 2 * y
+                self.pixbuf[idx : idx + 2] = color565(
+                    red[y], green[y], blue[y]
+                ).to_bytes(2, "big")
 
             self.actions.append(x)
 
     def draw(self):
         log_line = 0
+        white = color565(255, 255, 255)
         while self.active:
             if self.actions:
                 msg = self.actions.popleft()
                 if isinstance(msg, str):
                     print(msg)
-                    display.draw_text(0, log_line, msg, unispace, color565(255, 255, 255))
+                    display.draw_text(0, log_line, msg, unispace, white)
                     log_line += 24
                 else:
                     display.block(0, msg, 319, msg, self.pixbuf)
@@ -83,11 +113,42 @@ class SSTVDecoder:
 
             # read VIS code
             self.dem.read(0.03)  # start bit (1200hz)
-            vis = [sstv.bin_freq(self.dem.read(0.03)) for _ in range(8)]
+            vis = 0
+            for idx in range(7):
+                bit = self.dem.read(0.03) <= 1200
+                vis |= bit << idx
+            _ = self.dem.read(0.03) <= 1200  # ignore parity bit for the moment
             self.dem.read(0.03)  # stop bit (1200hz)
 
-            self.log(f"vis: {vis}")
-
-            self.read_s1()
+            # SCOTTIE MODES
+            if vis == 60:
+                self.log("decoding scottie 1")
+                self.read_scottie(256, 320, 0.0004320)
+            elif vis == 56:
+                self.log("decoding scottie 2")
+                self.read_scottie(256, 320, 0.0002752)
+            elif vis == 52:
+                self.log("decoding scottie 3")
+                self.read_scottie(128, 320, 0.0004320)
+            elif vis == 48:
+                self.log("decoding scottie 4")
+                self.read_scottie(128, 320, 0.0002752)
+            # MARTIN MODES
+            elif vis == 44:
+                self.log("decoding martin 1")
+                self.read_martin(256, 320, 0.0004576)
+            elif vis == 40:
+                self.log("decoding martin 2")
+                self.read_martin(256, 320, 0.0002288)
+            elif vis == 36:
+                self.log("decoding martin 3")
+                self.read_martin(128, 320, 0.0004576)
+            elif vis == 32:
+                self.log("decoding martin 4")
+                self.read_martin(128, 320, 0.0002288)
+            # FAILURE
+            else:
+                self.log(f"unknown vis: {vis}")
+                self.log("decode failed!")
         finally:
             self.active = False

@@ -94,25 +94,8 @@ static mp_obj_t sstv_Dem_sync(mp_obj_t self_in, mp_obj_t freq_obj,
   return mp_const_none;
 }
 
-static mp_obj_t sstv_bin_freq(mp_obj_t freq_obj) {
-  const uint16_t bins[] = {1100, 1200, 1300, 1500, 1900, 2300};
-  const uint16_t mids[] = {1150, 1250, 1400, 1700, 2100};
-
-  uint16_t freq = mp_obj_get_int(freq_obj);
-
-  for (uint8_t i = 0; i < 5; i++) {
-    if (freq < mids[i]) {
-      return mp_obj_new_int(bins[i]);
-    }
-  }
-
-  return mp_obj_new_int(bins[4]);
-}
-
-static mp_obj_t sstv_decode_color(mp_obj_t freq_obj) {
+static inline uint8_t _decode_color(uint16_t freq) {
   const Q15_16 f_step = 3.1372549;
-
-  Q15_16 freq = mp_obj_get_int(freq_obj);
 
   if (freq < 1500) {
     freq = 1500;
@@ -121,20 +104,37 @@ static mp_obj_t sstv_decode_color(mp_obj_t freq_obj) {
   }
 
   freq -= 1500;
-  freq /= f_step;
+  return ((Q15_16)freq) / f_step;
+}
 
-  return mp_obj_new_int(freq);
+static mp_obj_t sstv_Dem_read_line(mp_obj_t self_in, mp_obj_t buf_obj,
+                                   mp_obj_t length_obj) {
+  sstv_Dem_obj_t *self = MP_OBJ_TO_PTR(self_in);
+  Q15_16 length = mp_obj_get_float(length_obj);
+
+  mp_buffer_info_t buf_info;
+  mp_get_buffer(buf_obj, &buf_info, MP_BUFFER_WRITE);
+  uint8_t *buf = (uint8_t *)buf_info.buf;
+
+  for (uint16_t i = 0; i < buf_info.len; i++) {
+    uint16_t freq = dem_read(&self->dem, length);
+    buf[i] = _decode_color(freq);
+  }
+
+  return mp_const_none;
 }
 
 // Register locals (Dem.*)
 static MP_DEFINE_CONST_FUN_OBJ_2(sstv_Dem_read_obj, sstv_Dem_read);
 static MP_DEFINE_CONST_FUN_OBJ_3(sstv_Dem_sync_obj, sstv_Dem_sync);
 static MP_DEFINE_CONST_FUN_OBJ_3(sstv_Dem_expect_obj, sstv_Dem_expect);
+static MP_DEFINE_CONST_FUN_OBJ_3(sstv_Dem_read_line_obj, sstv_Dem_read_line);
 
 static const mp_rom_map_elem_t sstv_Dem_locals_dict_table[] = {
     {MP_ROM_QSTR(MP_QSTR_read), MP_ROM_PTR(&sstv_Dem_read_obj)},
     {MP_ROM_QSTR(MP_QSTR_sync), MP_ROM_PTR(&sstv_Dem_sync_obj)},
     {MP_ROM_QSTR(MP_QSTR_expect), MP_ROM_PTR(&sstv_Dem_expect_obj)},
+    {MP_ROM_QSTR(MP_QSTR_read_line), MP_ROM_PTR(&sstv_Dem_read_line_obj)},
 };
 
 static MP_DEFINE_CONST_DICT(sstv_Dem_locals_dict, sstv_Dem_locals_dict_table);
@@ -145,14 +145,9 @@ MP_DEFINE_CONST_OBJ_TYPE(sstv_type_Dem, MP_QSTR_Dem, MP_TYPE_FLAG_NONE,
                          &sstv_Dem_locals_dict);
 
 // Register globals (sstv.*)
-static MP_DEFINE_CONST_FUN_OBJ_1(sstv_bin_freq_obj, sstv_bin_freq);
-static MP_DEFINE_CONST_FUN_OBJ_1(sstv_decode_color_obj, sstv_decode_color);
-
 static const mp_rom_map_elem_t sstv_globals_table[] = {
     {MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_sstv)},
     {MP_ROM_QSTR(MP_QSTR_Dem), MP_ROM_PTR(&sstv_type_Dem)},
-    {MP_ROM_QSTR(MP_QSTR_bin_freq), MP_ROM_PTR(&sstv_bin_freq_obj)},
-    {MP_ROM_QSTR(MP_QSTR_decode_color), MP_ROM_PTR(&sstv_decode_color_obj)},
 };
 static MP_DEFINE_CONST_DICT(sstv_globals, sstv_globals_table);
 

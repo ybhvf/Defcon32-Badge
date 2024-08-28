@@ -5,9 +5,9 @@
 
 #define FINE_S 0.001
 #define COARSE_HZ 10
-#define FINE_HZ 50
+#define FINE_HZ 100
 
-#define FILT_SECTIONS 2
+#define FILT_SECTIONS 1
 
 typedef _Accum long Q15_16;
 typedef _Accum short Q7_8;

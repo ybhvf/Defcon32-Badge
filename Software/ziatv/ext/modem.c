@@ -6,11 +6,9 @@
 // Bandpass Filter
 //////////////////
 static const Q7_8 SOS[FILT_SECTIONS][6] = {
-    {0.01188354, 0.02376707, 0.01188354, 1., -1.65975591, 0.8105545},
-    {1., -2., 1., 1., -1.83076099, 0.88378139}};
+    {0.1215099, 0., -0.1215099, 1., -1.6758095, 0.75698019}};
 
-static const filt_state_t filt_state_init = {
-    .zi = {{0.30333257, -0.2436163}, {-0.31521611, 0.31521611}}};
+static const filt_state_t filt_state_init = {.zi = {{0., 0.}}};
 
 static inline int16_t sos_filt(int16_t sample, filt_state_t *state) {
   // direct-form II iir filter

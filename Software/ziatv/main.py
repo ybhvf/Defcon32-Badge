@@ -1,11 +1,8 @@
 import os
-import gc
 import time
 from lib.ili9341 import color565
 from machine import Pin, I2S, SPI
 from setup import display, sd_state, rotary_enc, neopixels, button, unispace
-
-gc.enable()
 
 if sd_state is True:
     from setup import sd_spi, sd
