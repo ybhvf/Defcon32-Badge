@@ -192,8 +192,14 @@ mp_obj_t sstv_Decoder_run(mp_obj_t self_in) {
     }
   }
 
+  // Position the image so that the last row is drawn at the bottom of the
+  // screen. Martin/Scottie modes include an optional 16-row header; this will
+  // ensure that this header is drawn at the bottom, and then overwritten by the
+  // image.
+  size_t offset = ((2 * SCREEN_ROWS) - self->rows) + 1 % SCREEN_ROWS;
+
   do {
-    size_t line = self->row_idx % SCREEN_ROWS;
+    size_t line = (offset + self->row_idx) % SCREEN_ROWS;
     // display.block(0, line, SCREEN_COLS - 1, line, self.pixbuf)
     mp_obj_t args[] = {self->display,
                        MP_OBJ_NEW_SMALL_INT(0),
