@@ -1,8 +1,8 @@
-import gc
+from machine import freq
 from setup import button, display
 from state import State
 
-import sstv_decode
+from sstv import Decoder
 
 class SSTVDecoderState(State):
     @property
@@ -28,8 +28,11 @@ class SSTVDecoderState(State):
     def run_decoder(self):
             display.clear()
 
-            dc = sstv_decode.SSTVDecoder()
+            freq(200000000)
+
+            dc = Decoder()
             dc.run()
-            gc.collect()
+
+            freq(125000000)
 
             self.in_image = True

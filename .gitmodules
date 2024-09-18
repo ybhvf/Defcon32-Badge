@@ -1,7 +1,7 @@
 [submodule "Software/micropython"]
 	path = Software/micropython
 	url = https://github.com/micropython/micropython.git
-	branch = tags/v1.23.0
+	branch = tags/v1.24.0-preview
 [submodule "Software/dir2uf2"]
 	path = Software/utils/dir2uf2
 	url = https://github.com/Gadgetoid/dir2uf2.git

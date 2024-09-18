@@ -9,6 +9,9 @@ b_ord, b_wn = buttord([1100, 2300], [1000, 2400], 3, 5, fs=RATE)
 filt = butter(b_ord, b_wn, fs=RATE, output='sos', btype='bandpass')
 zi = sosfilt_zi(filt)
 
+# filt = scipy.signal.iirfilter(1, [1100, 2300], fs=32000, output='sos')
+# zi = []
+
 # def py2c(string):
 #     return (repr(string)
 #             .replace('[','{')

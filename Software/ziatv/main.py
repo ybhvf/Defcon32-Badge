@@ -1,5 +1,3 @@
-import os
-import time
 from lib.ili9341 import color565
 from machine import Pin, I2S, SPI
 from setup import display, sd_state, rotary_enc, neopixels, button, unispace

@@ -3,8 +3,10 @@ add_library(ziatv_ext INTERFACE)
 
 # Add our source files to the lib
 target_sources(ziatv_ext INTERFACE
-    ${CMAKE_CURRENT_LIST_DIR}/sstv.c
     ${CMAKE_CURRENT_LIST_DIR}/modem.c
+    ${CMAKE_CURRENT_LIST_DIR}/rx.c
+    ${CMAKE_CURRENT_LIST_DIR}/tx.c
+    ${CMAKE_CURRENT_LIST_DIR}/py_sstv_decoder.c
 )
 
 # Add the current directory as an include directory.
