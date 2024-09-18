@@ -45,6 +45,8 @@ typedef struct {
   mp_obj_t display_block;
   mp_obj_t unispace;
   mp_obj_t _thread_start_new_thread;
+
+  mp_obj_t write_cb;
 } sstv_Decoder_obj_t;
 
 void _sstv_Decoder_fill_buf(sstv_Decoder_obj_t *self) {
@@ -70,7 +72,8 @@ void _sstv_Decoder_draw(void *self_ptr, uint16_t x, const uint8_t *r,
 }
 
 // Rx.__init__(self)
-mp_obj_t sstv_Decoder_make_new(const mp_obj_type_t *type) {
+mp_obj_t sstv_Decoder_make_new(const mp_obj_type_t *type, size_t n_args,
+                               size_t n_kw, const mp_obj_t *args) {
   sstv_Decoder_obj_t *self = mp_obj_malloc(sstv_Decoder_obj_t, type);
 
   // Create I2S mic for RX
@@ -88,18 +91,18 @@ mp_obj_t sstv_Decoder_make_new(const mp_obj_type_t *type) {
            rate = MP_OBJ_NEW_SMALL_INT(SAMPLE_RATE),
            ibuf = MP_OBJ_NEW_SMALL_INT(16000);
 
-  mp_obj_t args[] = {MP_OBJ_NEW_SMALL_INT(1),
-                     MP_OBJ_NEW_QSTR(MP_QSTR_sck), sck,
-                     MP_OBJ_NEW_QSTR(MP_QSTR_ws), ws,
-                     MP_OBJ_NEW_QSTR(MP_QSTR_sd), sd,
-                     MP_OBJ_NEW_QSTR(MP_QSTR_mode), mode,
-                     MP_OBJ_NEW_QSTR(MP_QSTR_format), fmt,
-                     MP_OBJ_NEW_QSTR(MP_QSTR_bits), bits,
-                     MP_OBJ_NEW_QSTR(MP_QSTR_rate), rate,
-                     MP_OBJ_NEW_QSTR(MP_QSTR_ibuf), ibuf,
-                     MP_OBJ_NULL};
+  mp_obj_t i2s_args[] = {MP_OBJ_NEW_SMALL_INT(1),
+                         MP_OBJ_NEW_QSTR(MP_QSTR_sck), sck,
+                         MP_OBJ_NEW_QSTR(MP_QSTR_ws), ws,
+                         MP_OBJ_NEW_QSTR(MP_QSTR_sd), sd,
+                         MP_OBJ_NEW_QSTR(MP_QSTR_mode), mode,
+                         MP_OBJ_NEW_QSTR(MP_QSTR_format), fmt,
+                         MP_OBJ_NEW_QSTR(MP_QSTR_bits), bits,
+                         MP_OBJ_NEW_QSTR(MP_QSTR_rate), rate,
+                         MP_OBJ_NEW_QSTR(MP_QSTR_ibuf), ibuf,
+                         MP_OBJ_NULL};
 
-  self->mic = MP_OBJ_TYPE_GET_SLOT(&machine_i2s_type, make_new)(&machine_i2s_type, 1, 8, args);
+  self->mic = MP_OBJ_TYPE_GET_SLOT(&machine_i2s_type, make_new)(&machine_i2s_type, 1, 8, i2s_args);
   // clang-format on
 
   mp_obj_t dest[2];
@@ -145,6 +148,8 @@ mp_obj_t sstv_Decoder_make_new(const mp_obj_type_t *type) {
   mp_obj_t _thread = mp_import_name(qstr_from_str("_thread"), MP_OBJ_NULL, 0);
   mp_load_method(_thread, qstr_from_str("start_new_thread"), dest);
   self->_thread_start_new_thread = dest[0];
+
+  self->write_cb = args[0];
 
   return MP_OBJ_FROM_PTR(self);
 }
@@ -196,19 +201,25 @@ mp_obj_t sstv_Decoder_run(mp_obj_t self_in) {
   // screen. Martin/Scottie modes include an optional 16-row header; this will
   // ensure that this header is drawn at the bottom, and then overwritten by the
   // image.
-  size_t offset = ((2 * SCREEN_ROWS) - self->rows) + 1 % SCREEN_ROWS;
+  size_t offset = ((2 * SCREEN_ROWS) - self->rows) % SCREEN_ROWS;
 
+  size_t last_line = -1;
   do {
     size_t line = (offset + self->row_idx) % SCREEN_ROWS;
-    // display.block(0, line, SCREEN_COLS - 1, line, self.pixbuf)
-    mp_obj_t args[] = {self->display,
-                       MP_OBJ_NEW_SMALL_INT(0),
-                       MP_OBJ_NEW_SMALL_INT(line),
-                       MP_OBJ_NEW_SMALL_INT(SCREEN_COLS - 1),
-                       MP_OBJ_NEW_SMALL_INT(line),
-                       self->linebuf_mv,
-                       MP_OBJ_NULL};
-    mp_call_function_n_kw(self->display_block, 6, 0, args);
+    if (line != last_line) {
+      last_line = line;
+      // display.block(0, line, SCREEN_COLS - 1, line, self.pixbuf)
+      mp_obj_t args[] = {self->display,
+                         MP_OBJ_NEW_SMALL_INT(0),
+                         MP_OBJ_NEW_SMALL_INT(line),
+                         MP_OBJ_NEW_SMALL_INT(SCREEN_COLS - 1),
+                         MP_OBJ_NEW_SMALL_INT(line),
+                         self->linebuf_mv,
+                         MP_OBJ_NULL};
+      mp_call_function_n_kw(self->display_block, 6, 0, args);
+      // python callback for writing line to the sdcard
+      mp_call_function_1(self->write_cb, self->linebuf_mv);
+    }
   } while (self->active && self->row_idx < self->rows);
 
   return mp_const_none;

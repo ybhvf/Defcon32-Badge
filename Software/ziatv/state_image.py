@@ -12,25 +12,16 @@ class ImageDisplayState(State):
 
     def __init__(self):
         raw_files = []
-        try:
-            files = listdir("/sd/images")
-        except Exception as e:
-            print("No SD Card Images")
-            files = []
+        for dir in ('/', '/sd', '/sd/images'):
+            try:
+                files = listdir(dir)
+            except Exception as _:
+                continue
 
-        for file in files:
-            if file.endswith(".raw") and (not file.startswith(".")):
-                raw_files.append({"name": "/sd/images/{}".format(file), "pretty": file})
+            for file in files:
+                if file.endswith(".raw") and (not file.startswith(".")):
+                    raw_files.append({"name": f"{dir}/{file}", "pretty": file})
 
-        try:
-            files = listdir("/")
-        except Exception as e:
-            print("No images in root?")
-            files = []
-
-        for file in files:
-            if file.endswith(".raw") and (not file.startswith(".")):
-                raw_files.append({"name": "/{}".format(file), "pretty": file})
         raw_files.append({"name": "menu", "pretty": "Return To Menu"})
 
         self.menu_items = raw_files

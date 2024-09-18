@@ -4,6 +4,7 @@ from state import State
 
 from sstv import Decoder
 
+
 class SSTVDecoderState(State):
     @property
     def name(self):
@@ -26,13 +27,14 @@ class SSTVDecoderState(State):
                 core_machine.go_to_state("menu")
 
     def run_decoder(self):
-            display.clear()
+        display.clear()
 
-            freq(200000000)
+        freq(200000000)
 
-            dc = Decoder()
+        with open("/sd/decoded.raw", "wb") as f:
+            dc = Decoder(f.write)
             dc.run()
 
-            freq(125000000)
+        freq(125000000)
 
-            self.in_image = True
+        self.in_image = True
