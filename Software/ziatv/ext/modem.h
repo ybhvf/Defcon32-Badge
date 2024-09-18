@@ -4,7 +4,7 @@
 #define SAMPLE_RATE 32000
 #define FRAMES 4096
 
-#define FINE_S 0.001
+#define FINE_S 0.0005
 #define COARSE_HZ 20
 #define FINE_HZ 100
 

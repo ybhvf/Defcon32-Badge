@@ -139,7 +139,7 @@ void dem_sync(dem_t *dem, uint16_t freq, float dt) {
 void dem_expect(dem_t *dem, uint16_t freq, float dt) {
   uint16_t min_f = freq - COARSE_HZ, max_f = freq + COARSE_HZ;
 
-  float step = 0.99 * dt;
+  float step = 0.98 * dt;
 
   // read half of tone
   uint16_t heard = dem_read(dem, step);
